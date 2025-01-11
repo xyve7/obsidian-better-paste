@@ -1,0 +1,10 @@
+{
+	"id": "better-renamer",
+	"name": "Better Renamer",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Prompt to rename pasted images.",
+	"author": "xyve",
+	"authorUrl": "https://www.github.com/xyve7",
+	"isDesktopOnly": false
+}
