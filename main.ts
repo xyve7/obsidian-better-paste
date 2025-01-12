@@ -16,6 +16,7 @@ export default class BetterPaste extends Plugin {
 	appLoaded: boolean = false;
 
 	async onload() {
+		await this.load
 		await this.loadSettings();
 
 		// Once the app is loaded, it will set the variable
@@ -23,21 +24,18 @@ export default class BetterPaste extends Plugin {
 			this.appLoaded = true;
 		})
 
-		this.app.vault.on('create', async (f) => {
+		this.app.vault.on('create', async (file) => {
 			// This event gets fired when obsidian is being loaded
 			// I don't know why this happens, but this is a way to prevent it
 			if (!this.appLoaded) {
 				return;
 			}
 			// Check if it's a file
-			if (!(f instanceof TFile)) {
-				return;
-			}
-			// Create a new file variable with the correct type
-			const file: TFile = f as TFile;
-			if (file.name.startsWith(PASTED_IMAGE_DEFAULT)) {
-				// Open the renaming model
-				new RenameModal(this.app, file, this.settings).open();
+			if (file instanceof TFile) {
+				if (file.name.startsWith(PASTED_IMAGE_DEFAULT)) {
+					// Open the renaming model
+					new RenameModal(this.app, file, this.settings).open();
+				}
 			}
 		})
 
@@ -83,10 +81,7 @@ class RenameModal extends Modal {
 			});
 
 		// Setup error display
-		const errorDisplay = contentEl.createDiv({cls: 'error-container'});
-		errorDisplay.style.color = 'red';
-		errorDisplay.style.display = 'none';
-		errorDisplay.style.marginBottom = '10px';
+		const errorDisplay = contentEl.createEl('p', {cls: 'error-container'});
 			
 		// Rename button
 		const renameButton = new Setting(contentEl)
@@ -98,7 +93,7 @@ class RenameModal extends Modal {
 					const newPath = path.join(parent, this.name + '.' + this.file.extension);
 					// Attempt to rename the file
 					try {
-						this.rename(newPath);
+						await this.app.fileManager.renameFile(this.file, newPath);
 						this.close();
 					} catch {
 						// File exists, check if we replace it
@@ -108,12 +103,11 @@ class RenameModal extends Modal {
 							await this.app.vault.delete(existingFile!);
 
 							// Reattempt rename
-							this.rename(newPath);
+							await this.app.fileManager.renameFile(this.file, newPath);
 
 							this.close();
 						} else {
-							errorDisplay.textContent = 'File already exists!';
-							errorDisplay.style.display = 'block';
+							errorDisplay.setText('File already exists!')
 						}
 					}
 				})
@@ -123,11 +117,6 @@ class RenameModal extends Modal {
 	onClose() {
 		const {contentEl} = this;
 		contentEl.empty();
-	}
-	// NOTE: I will likely add more logic here to make sure file links get replaced.
-	async rename(newPath: string) {
-		// Rename the file
-		await this.app.fileManager.renameFile(this.file, newPath);
 	}
 }
 
