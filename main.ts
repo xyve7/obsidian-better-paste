@@ -13,30 +13,23 @@ const PASTED_IMAGE_DEFAULT = 'Pasted image'
 
 export default class BetterPaste extends Plugin {
 	settings: BetterPasteSettings;
-	appLoaded: boolean = false;
 
 	async onload() {
-		await this.load
 		await this.loadSettings();
 
-		// Once the app is loaded, it will set the variable
+		// Once the app is loaded, it will register the create event
 		this.app.workspace.onLayoutReady(() => {
-			this.appLoaded = true;
-		})
-
-		this.app.vault.on('create', async (file) => {
-			// This event gets fired when obsidian is being loaded
-			// I don't know why this happens, but this is a way to prevent it
-			if (!this.appLoaded) {
-				return;
-			}
-			// Check if it's a file
-			if (file instanceof TFile) {
-				if (file.name.startsWith(PASTED_IMAGE_DEFAULT)) {
-					// Open the renaming model
-					new RenameModal(this.app, file, this.settings).open();
+			console.log('loaded');
+			this.registerEvent(this.app.vault.on('create', async (file) => {
+				console.log('create');
+				// Check if it's a file
+				if (file instanceof TFile) {
+					if (file.name.startsWith(PASTED_IMAGE_DEFAULT)) {
+						// Open the renaming model
+						new RenameModal(this.app, file, this.settings).open();
+					}
 				}
-			}
+			}))
 		})
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
@@ -44,7 +37,6 @@ export default class BetterPaste extends Plugin {
 	}
 
 	onunload() {
-
 	}
 
 	async loadSettings() {
@@ -68,7 +60,7 @@ class RenameModal extends Modal {
 
 	onOpen() {
 		const {contentEl, titleEl} = this;
-		titleEl.setText('Renaming Pasted Image');
+		titleEl.setText('Renaming pasted image');
 		
 		// Enter a new name
 		const nameField = new Setting(contentEl)

@@ -1,10 +1,10 @@
 {
 	"id": "better-paste",
 	"name": "Better Paste",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Better renaming for pasted images.",
 	"author": "xyve",
 	"authorUrl": "https://www.github.com/xyve7",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
