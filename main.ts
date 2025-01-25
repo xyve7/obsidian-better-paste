@@ -19,9 +19,7 @@ export default class BetterPaste extends Plugin {
 
 		// Once the app is loaded, it will register the create event
 		this.app.workspace.onLayoutReady(() => {
-			console.log('loaded');
 			this.registerEvent(this.app.vault.on('create', async (file) => {
-				console.log('create');
 				// Check if it's a file
 				if (file instanceof TFile) {
 					if (file.name.startsWith(PASTED_IMAGE_DEFAULT)) {
